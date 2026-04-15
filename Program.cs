@@ -109,17 +109,23 @@ class Program
         }
 
         Console.WriteLine("\nRECEIPT");
+        Console.WriteLine("================================");
+        Console.WriteLine("       KYLE'S CLOTHING STORE       ");
+        Console.WriteLine("================================");
+        Console.WriteLine("receipt No: " + new Random().Next(1000, 9999));
+        Console.WriteLine("Date: " + DateTime.Now);
+        Console.WriteLine("================================\n");
     for (int i = 0; i < products.Length; i++)
     {
         if (cartQty[i] > 0)
         {
             double total = products[i].GetTotal(cartQty[i]);
-            Console.WriteLine(products[i].Name + " X " + cartQty[i] + " = ₱" + total);
+            Console.WriteLine(products[i].Name + " X " + cartQty[i] + " = PHP" + total);
             grandTotal += total;
         }
     }
 
-    Console.WriteLine("Grand Total: ₱" + grandTotal);
+    Console.WriteLine("Grand Total: PHP" + grandTotal);
 
     double discount = 0;
     if (grandTotal >= 5000)
@@ -127,8 +133,8 @@ class Program
         discount = grandTotal * 0.10;
     }
 
-    Console.WriteLine("Discount: ₱" + discount);
-    Console.WriteLine("Final Total: ₱" + (grandTotal - discount));
+    Console.WriteLine("Discount: PHP" + discount);
+    Console.WriteLine("Final Total: PHP" + (grandTotal - discount));
 
     Console.WriteLine("\nUPDATED STOCK");
     for (int i = 0; i < products.Length; i++)
@@ -136,7 +142,8 @@ class Program
         Console.WriteLine(products[i].Name + " - " + products[i].Stock);
     }
 
-    Console.WriteLine("\nThank you for shopping with us!");
+    Console.WriteLine("\nThank you for shopping with us!");   
+    Console.WriteLine("Have a nice day!"); 
 }
 }
 

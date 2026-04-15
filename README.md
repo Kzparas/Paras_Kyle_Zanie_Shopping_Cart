@@ -4,3 +4,4 @@ Initial Project Setup with README
 Added product class and basic store menu 
 Added cart logic stock validation and discount
 Finalized flowchart updated stock 
+Finalized receipt design and fixed the peso sign

@@ -4,6 +4,7 @@ Initial Project Setup with README
 Added product class and basic store menu 
 Added cart logic stock validation and discount
 Finalized flowchart updated stock 
+Fixed invalid input handling for Y/N prompt in shopping loop and improved user input validation and loop control in checkout system
 Finalized receipt design and fixed the peso sign
 ## Ai Usage in this project
 I used Ai to help me improve and organize my shopping cart system project

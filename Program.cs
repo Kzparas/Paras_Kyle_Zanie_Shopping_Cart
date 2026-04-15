@@ -1,5 +1,10 @@
 ﻿using System;
 using System.Data.Common;
+using System.Globalization;
+using System.Net;
+using System.Numerics;
+using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 
 class Product
 {
@@ -12,40 +17,132 @@ class Product
     {
         Id = id;
         Name = name;
-        price = price;
-        stock = stock;
+        Price = price;
+        Stock = stock;
     }
 
-    public static void Main()
+    public void DisplayProduct()
     {
-        Console.Writeline(Id + ". " + Name + " - ₱" + Price + " |  Stock: " + stock);
+        Console.WriteLine(Id + ". " + Name + " - ₱" + Price + " | Stock: " + Stock);
     }
     public double GetTotal(int qty)
     { 
-        return Predicate * qty;
+        return Price * qty;
     }
 }
 
-class program
+class Program
 { 
     static void Main()
     {
-        Product[] products = new Product [3];
+        Product[] products = new Product [7];
         products [0] = new Product(1, "Tshirt", 500, 5);
-        products[1] = new products(2,"Sweater", 600, 4);
-        products[2= new products(3,"Hoodie", 750, 7);
+        products[1] = new Product(2,"Sweater", 600, 4);
+        products[2]= new Product(3,"Hoodie", 750, 7);
+        products[3] = new Product(4, "Jeans", 1000, 3);
+        products[4] = new Product(5, "Shoes", 1500, 2);
+        products[5] = new Product(6, "Closed cap", 300, 10);
+        products[6] = new Product(7, "Jorts", 200, 8);
 
-        int[] cartQty = new int[3]; 
+        int[] cartQty = new int[7]; 
         double grandTotal = 0;
         string choice = "Y";
 
         while (choice == "Y")
         {
-            Console.WriteLine("\STORE MENU");
+            Console.WriteLine("\nWELCOME TO OUR STORE!");
+            Console.WriteLine("\nSTORE MENU");
             for (int i = 0; i < products.Length; i++)
             {
                 products[i].DisplayProduct();
             }
+
+            Console.WriteLine("Enter your product number: ");
+            int num;
+            if (!int. TryParse(Console.ReadLine(), out num))
+            {
+                Console.WriteLine("Invalid number.");
+                continue;
+            }
+
+            if (num < 1   || num > products.Length)
+            {
+                Console.WriteLine("Wrong product number.");
+                continue;
+            }
+
+            Product p = products[num - 1];
+            
+            if (p.Stock == 0)
+            {
+                Console.WriteLine("Sorry, " + p.Name + " is out of stock.");
+                continue;
+            }
+
+            Console.Write("Enter quantity: ");
+            int qty;
+            if (!int.TryParse(Console.ReadLine(), out qty))
+            {
+                Console.WriteLine("Invalid quantity.");
+                continue;
+            }
+
+            if (qty <= 0)
+            {
+                Console.WriteLine("Quantity must be more than 0.");
+                continue;
+            }
+
+            if (qty > p.Stock)
+            {
+                Console.WriteLine("Not enough stock.");
+                continue;
+            }
+
+            cartQty[num - 1] += qty;
+            p.Stock -= qty;
+
+            Console.WriteLine("Added to cart!");
+
+            Console.Write("Add more? Y/N: ");
+            choice = Console.ReadLine().ToUpper();
+        }
+
+        Console.WriteLine("\nRECEIPT");
+    for (int i = 0; i < products.Length; i++)
+    {
+        if (cartQty[i] > 0)
+        {
+            double total = products[i].GetTotal(cartQty[i]);
+            Console.WriteLine(products[i].Name + " X " + cartQty[i] + " = ₱" + total);
+            grandTotal += total;
+        }
+    }
+
+    Console.WriteLine("Grand Total: ₱" + grandTotal);
+
+    double discount = 0;
+    if (grandTotal >= 5000)
+    {
+        discount = grandTotal * 0.10;
+    }
+
+    Console.WriteLine("Discount: ₱" + discount);
+    Console.WriteLine("Final Total: ₱" + (grandTotal - discount));
+
+    Console.WriteLine("\nUPDATED STOCK");
+    for (int i = 0; i < products.Length; i++)
+    {
+        Console.WriteLine(products[i].Name + " - " + products[i].Stock);
+    }
+
+    Console.WriteLine("\nThank you for shopping with us!");
+}
+}
+
+            
+    
+        
 
         
 

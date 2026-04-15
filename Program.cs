@@ -105,7 +105,22 @@ class Program
             Console.WriteLine("Added to cart!");
 
             Console.Write("Add more? Y/N: ");
-            choice = Console.ReadLine().ToUpper();
+            
+
+while (true)
+{
+    choice = (Console.ReadLine() ?? "").ToUpper();
+
+    if (choice == "Y" || choice == "N")
+        break;
+
+    Console.WriteLine("Invalid input. Please enter Y or N only.");
+}
+
+if (choice == "N")
+{
+    break;
+}
         }
 
         Console.WriteLine("\nRECEIPT");

@@ -23,11 +23,27 @@ class Product
 
     public void DisplayProduct()
     {
-        Console.WriteLine(Id + ". " + Name + " - ₱" + Price + " | Stock: " + Stock);
+        if (Stock != 0)
+        {
+            Console.WriteLine(Id + ". " + Name + " - PHP" + Price + " (Stock: " + Stock + ")");
+        }
+        else
+        {
+            Console.WriteLine(Id + ". " + Name + " - PHP" + Price + " (Out of stock)");
+        }
     }
     public double GetTotal(int qty)
     { 
         return Price * qty;
+    }
+
+    public bool HasenoughStock(int qty)
+    {
+        return qty <= Stock;
+    }
+    public void deductStock(int qty)
+    {
+        Stock -= qty;
     }
 }
 

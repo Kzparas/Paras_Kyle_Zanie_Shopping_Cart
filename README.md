@@ -21,3 +21,5 @@ Some prompts/questions that i asked were:
 - How can i make the receipt look much better
 After using AI, i improved
 - After using ai, i was able to improve my project in many ways. at first, my code only showed the basic store menu and item selection, but with the help of ai, i made the receipt look nicer and more organized like a real store receipt. i also improved the stock update part so it clearly shows the remaining items after the customer checks out. another thing i improved was adding a thank you message and a better output design so the whole program looks cleaner and easier to read. ai also helped me fix small mistakes in my code and improve the validation messages. because of these improvements, my shopping cart system became more complete, neat, and easier to understand.
+Updated part 2 of shopping cart activity
+Added product methods for stock handling

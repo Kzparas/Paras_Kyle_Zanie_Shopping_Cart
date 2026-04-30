@@ -25,3 +25,4 @@ Updated part 2 of shopping cart activity
 Added product methods for stock handling
 Added categories for the items in the cart and also added search products, view cart options and lastly check out option
 Added Order History and Receipt Number and Date & Time for a better receipt output
+Added Payment Validation and Change Computation

@@ -50,21 +50,23 @@ class Product
     }
 }
 
-class Program
+internal class NewBaseType
 {
     static void Main()
     {
         Product[] products = [
-            new Product(1, "Tshirt", "Topwear", 500, 5),
-            new Product(2, "Sweater", "topwear", 600, 4),
-            new Product(3, "Hoodie", "Topwear", 750, 7),
-            new Product(4, "Jeans", "Bottomwear", 1200, 3),
-            new Product(5, "Shoes", "Footwear", 1500, 2),
-            new Product(6, "Closed cap", "Accessories", 300, 10),
-            new Product(7, "Jorts", "Bottomwear", 200, 8)
+            new Product(1, "Tshirt", "topwear", 500, 15),
+            new Product(2, "Sweater", "topwear", 600, 17),
+            new Product(3, "Hoodie", "topwear", 750, 12),
+            new Product(4, "Jeans", "bottomwear", 1200, 16),
+            new Product(5, "Shoes", "footwear", 1500, 22),
+            new Product(6, "Closed cap", "accessories", 300, 10),
+            new Product(7, "Jorts", "bottomwear", 200, 23),
         ];
 
         int[] cartQty = new int[7];
+        double[] orderHistory = new double[10];
+        int orderCount = 0;
         string choice = "Y";
 
         while (choice == "Y")
@@ -74,6 +76,7 @@ class Program
             Console.WriteLine("2. Search Product");
             Console.WriteLine("3. View Cart");
             Console.WriteLine("4. Checkout");
+            Console.WriteLine("5. View Order History");
             Console.Write("Choose an option: ");
             string option = Console.ReadLine();
 
@@ -197,6 +200,10 @@ class Program
             {
                 double grandtotal = 0;
                 Console.WriteLine("\n--- RECEIPT ---");
+                int receiptNo = 1;
+                Console.WriteLine("Receipt No: " + receiptNo);
+                Console.WriteLine("Date: " + DateTime.Now);
+                Console.WriteLine("-----------------------------");
 
                 for (int i = 0; i < products.Length; i++)
                 {
@@ -209,32 +216,81 @@ class Program
                 }
 
                 double discount = (grandtotal >= 5000) ? grandtotal * 0.10 : 0;
-                double nettotal = grandtotal - discount;
+                double netTotal = grandtotal - discount;
 
                 Console.WriteLine("\nTotal: PHP" + grandtotal);
                 Console.WriteLine("Discount: PHP" + discount);
-                Console.WriteLine("Final: PHP " + nettotal);
+                Console.WriteLine("Final: PHP " + netTotal);
 
                 double payment;
-                while (true)
-                {
+                while (true)                {
                     Console.Write("Enter payment amount: ");
                     if (!double.TryParse(Console.ReadLine(), out payment)) continue;
 
-                    if (payment >= nettotal) break;
+                    if (payment >= netTotal) break;
                     Console.WriteLine("Insufficient payment.");
                 }
 
-                Console.WriteLine("Change: PHP" + (payment - nettotal));
+                Console.WriteLine("Change: PHP" + (payment - netTotal));
+                
+                // Save order to history
+                orderHistory[orderCount] = netTotal;
+                orderCount++;
 
-                Console.WriteLine("\nThank you for shopping with us!");
-                break;
+                //LOW STOCK ALERT
+                Console.WriteLine("\nLOW STOCK ALERT:");
+                for (int i = 0; i < products.Length; i++)                {
+                    if (products[i].Stock <= 5)
+                    {
+                        Console.WriteLine(products[i].Name + " has only " + products[i].Stock + " left in stock.");
+                    }
+                }
+                    Console.WriteLine("\nThank you for shopping with us!");
+            
             }
 
-            Console.Write("\nGo back to main menu? (Y/N): ");
-            choice = Console.ReadLine().ToUpper();
+            else if (option == "5")
+                {
+                    Console.WriteLine("\n--- ORDER HISTORY ---");
+                    for (int i = 0; i < orderCount; i++)
+                    {
+                        Console.WriteLine("Order " + (i + 1) + ": PHP" + orderHistory[i]);
+                    }
+                
+
+                    for (int i = 0; i < products.Length; i++)
+                    {
+                        if (cartQty[i] > 0)
+                        {
+                         
+                        }
+                    }
+                  
+                    {
+                    
+
+                    Console.WriteLine("\nThank you for shopping with us!");
+                    Console.WriteLine("\nLOW STOCK ALERT:");
+                    for (int i = 0; i < products.Length; i++)
+                    {
+                        if (products[i].Stock <= 5)
+                        {
+                            Console.WriteLine(products[i].Name + " has only " + products[i].Stock + " left in stock.");
+                        }
+                    }
+                    break;
+                }
+
+                Console.Write("\nGo back to main menu? (Y/N): ");
+                choice = Console.ReadLine().ToUpper();
+            }
         }
     }
+
+
+class Program : NewBaseType
+{
+}
 }
 
 
@@ -244,4 +300,3 @@ class Program
 
 
 
-               

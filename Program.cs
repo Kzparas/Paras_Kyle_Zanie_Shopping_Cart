@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.Design;
 using System.Data.Common;
 using System.Globalization;
 using System.Net;
@@ -12,11 +13,13 @@ class Product
     public string Name;
     public double Price;
     public int Stock;
+    public string Category;
 
-    public Product (int id, string name, double price, int stock)
+    public Product (int id, string name, string category, double price, int stock)
     {
         Id = id;
         Name = name;
+        Category = category;
         Price = price;
         Stock = stock;
     }
@@ -25,11 +28,11 @@ class Product
     {
         if (Stock != 0)
         {
-            Console.WriteLine(Id + ". " + Name + " - PHP" + Price + " (Stock: " + Stock + ")");
+            Console.WriteLine(Id + ". " + Name + " (" + Category + ") - PHP" + Price + " (" + Stock + " in stock)");
         }
         else
         {
-            Console.WriteLine(Id + ". " + Name + " - PHP" + Price + " (Out of stock)");
+            Console.WriteLine(Id + ". " + Name + " (" + Category + ") - PHP" + Price + " (Out of stock)");
         }
     }
     public double GetTotal(int qty)
@@ -48,147 +51,197 @@ class Product
 }
 
 class Program
-{ 
+{
     static void Main()
     {
-        Product[] products = new Product [7];
-        products [0] = new Product(1, "Tshirt", 500, 5);
-        products[1] = new Product(2,"Sweater", 600, 4);
-        products[2]= new Product(3,"Hoodie", 750, 7);
-        products[3] = new Product(4, "Jeans", 1000, 3);
-        products[4] = new Product(5, "Shoes", 1500, 2);
-        products[5] = new Product(6, "Closed cap", 300, 10);
-        products[6] = new Product(7, "Jorts", 200, 8);
+        Product[] products = [
+            new Product(1, "Tshirt", "Topwear", 500, 5),
+            new Product(2, "Sweater", "topwear", 600, 4),
+            new Product(3, "Hoodie", "Topwear", 750, 7),
+            new Product(4, "Jeans", "Bottomwear", 1200, 3),
+            new Product(5, "Shoes", "Footwear", 1500, 2),
+            new Product(6, "Closed cap", "Accessories", 300, 10),
+            new Product(7, "Jorts", "Bottomwear", 200, 8)
+        ];
 
-        int[] cartQty = new int[7]; 
-        double grandTotal = 0;
+        int[] cartQty = new int[7];
         string choice = "Y";
 
         while (choice == "Y")
         {
-            Console.WriteLine("\nWELCOME TO OUR STORE!");
-            Console.WriteLine("\nSTORE MENU");
-            for (int i = 0; i < products.Length; i++)
+            Console.WriteLine("\n====== MAIN MENU ======");
+            Console.WriteLine("1. View Products");
+            Console.WriteLine("2. Search Product");
+            Console.WriteLine("3. View Cart");
+            Console.WriteLine("4. Checkout");
+            Console.Write("Choose an option: ");
+            string option = Console.ReadLine();
+
+            // ============== VIEW PRODUCTS ==============
+            if (option == "1")
             {
-                products[i].DisplayProduct();
+                Console.WriteLine("--- PRODUCTS LISTS ---");
+
+                for (int i = 0; i < products.Length; i++)
+                    products[i].DisplayProduct();
+
+                Console.Write("Enter product ID: ");
+                if (!int.TryParse(Console.ReadLine(), out int id)) continue;
+
+                if (id < 1 || id > products.Length) continue;
+
+                Product p = products[id - 1];
+
+                if (p.Stock == 0)
+                {
+                    Console.WriteLine("Out of stock.");
+                    continue;
+                }
+                Console.Write("Enter quantity: ");
+                if (!int.TryParse(Console.ReadLine(), out int qty)) continue;
+
+                if (qty <= 0) continue;
+
+                if (p.HasenoughStock(qty))
+                {
+                    cartQty[id - 1] += qty;
+                    p.deductStock(qty);
+                    Console.WriteLine("Added to cart.");
+                }
+                else
+                {
+                    Console.WriteLine("Not enough stock.");
+                }
+            }
+            // ============== SEARCH PRODUCT ============== 
+            else if (option == "2")
+            {
+                Console.Write("Enter product name: ");
+                string search = Console.ReadLine().ToLower();
+
+                bool found = false;
+                Console.WriteLine("--- SEARCH RESULTS ---");
+                for (int i = 0; i < products.Length; i++)
+                {
+                    if (products[i].Name.ToLower().Contains(search))
+                    {
+                        products[i].DisplayProduct();
+                        found = true;
+                    }
+                }
+
+                if (!found)
+                    Console.WriteLine("Product not found.");
+            }
+            // ============== VIEW CART ==============
+            else if (option == "3")
+            {
+                Console.WriteLine("--- YOUR CART ---");
+
+                for (int i = 0; i < products.Length; i++)
+                {
+                    if (cartQty[i] > 0)
+                    {
+                        Console.WriteLine(products[i].Name + " x " + cartQty[i]);
+
+                    }
+                }
+
+                Console.WriteLine("\n1. Remove item");
+                Console.WriteLine("2. Update quantity");
+                Console.WriteLine("3. Back");
+                Console.Write("Choose: ");
+                string cartOption = Console.ReadLine();
+
+                if (cartOption == "1")
+                {
+                    Console.Write("Enter product ID to remove: ");
+                    if (!int.TryParse(Console.ReadLine(), out int id)) continue;
+
+                    if (id < 1 || id > products.Length || cartQty[id - 1] == 0) continue;
+
+                    products[id - 1].Stock += cartQty[id - 1];
+                    cartQty[id - 1] = 0;
+
+                    Console.WriteLine("Item removed from cart.");
+                }
+                else if (cartOption == "2")
+                {
+                    Console.Write("Enter product ID to update: ");
+                    if (!int.TryParse(Console.ReadLine(), out int id)) continue;
+
+                    Console.Write("Enter new quantity: ");
+                    if (!int.TryParse(Console.ReadLine(), out int newQty)) continue;
+
+                    if (newQty < 0) continue;
+
+                    int currentQty = cartQty[id - 1];
+                    products[id - 1].Stock += currentQty;
+
+                    if (products[id - 1].HasenoughStock(newQty))
+                    {
+                        cartQty[id - 1] = newQty;
+                        products[id - 1].deductStock(newQty);
+
+                        Console.WriteLine("Cart updated.");
+                    }
+                    else
+                    {
+                        products[id - 1].deductStock(currentQty);
+                        Console.WriteLine("Not enough stock.");
+                    }
+                }
+            }
+            // ============== CHECKOUT ==============
+            else if (option == "4")
+            {
+                double grandtotal = 0;
+                Console.WriteLine("\n--- RECEIPT ---");
+
+                for (int i = 0; i < products.Length; i++)
+                {
+                    if (cartQty[i] > 0)
+                    {
+                        double total = products[i].GetTotal(cartQty[i]);
+                        Console.WriteLine(products[i].Name + " x " + cartQty[i] + " = PHP" + total);
+                        grandtotal += total;
+                    }
+                }
+
+                double discount = (grandtotal >= 5000) ? grandtotal * 0.10 : 0;
+                double nettotal = grandtotal - discount;
+
+                Console.WriteLine("\nTotal: PHP" + grandtotal);
+                Console.WriteLine("Discount: PHP" + discount);
+                Console.WriteLine("Final: PHP " + nettotal);
+
+                double payment;
+                while (true)
+                {
+                    Console.Write("Enter payment amount: ");
+                    if (!double.TryParse(Console.ReadLine(), out payment)) continue;
+
+                    if (payment >= nettotal) break;
+                    Console.WriteLine("Insufficient payment.");
+                }
+
+                Console.WriteLine("Change: PHP" + (payment - nettotal));
+
+                Console.WriteLine("\nThank you for shopping with us!");
+                break;
             }
 
-            Console.WriteLine("Enter your product number: ");
-            int num;
-            if (!int. TryParse(Console.ReadLine(), out num))
-            {
-                Console.WriteLine("Invalid number.");
-                continue;
-            }
-
-            if (num < 1   || num > products.Length)
-            {
-                Console.WriteLine("Wrong product number.");
-                continue;
-            }
-
-            Product p = products[num - 1];
-            
-            if (p.Stock == 0)
-            {
-                Console.WriteLine("Sorry, " + p.Name + " is out of stock.");
-                continue;
-            }
-
-            Console.Write("Enter quantity: ");
-            int qty;
-            if (!int.TryParse(Console.ReadLine(), out qty))
-            {
-                Console.WriteLine("Invalid quantity.");
-                continue;
-            }
-
-            if (qty <= 0)
-            {
-                Console.WriteLine("Quantity must be more than 0.");
-                continue;
-            }
-
-            if (qty > p.Stock)
-            {
-                Console.WriteLine("Not enough stock.");
-                continue;
-            }
-
-            cartQty[num - 1] += qty;
-            p.Stock -= qty;
-
-            Console.WriteLine("Added to cart!");
-
-            Console.Write("Add more? Y/N: ");
-            
-
-while (true)
-{
-    choice = (Console.ReadLine() ?? "").ToUpper();
-
-    if (choice == "Y" || choice == "N")
-        break;
-
-    Console.WriteLine("Invalid input. Please enter Y or N only.");
-}
-
-if (choice == "N")
-{
-    break;
-}
+            Console.Write("\nGo back to main menu? (Y/N): ");
+            choice = Console.ReadLine().ToUpper();
         }
-
-        Console.WriteLine("\nRECEIPT");
-        Console.WriteLine("================================");
-        Console.WriteLine("       KYLE'S CLOTHING STORE       ");
-        Console.WriteLine("================================");
-        Console.WriteLine("receipt No: " + new Random().Next(1000, 9999));
-        Console.WriteLine("Date: " + DateTime.Now);
-        Console.WriteLine("================================\n");
-    for (int i = 0; i < products.Length; i++)
-    {
-        if (cartQty[i] > 0)
-        {
-            double total = products[i].GetTotal(cartQty[i]);
-            Console.WriteLine(products[i].Name + " X " + cartQty[i] + " = PHP" + total);
-            grandTotal += total;
-        }
     }
-
-    Console.WriteLine("Grand Total: PHP" + grandTotal);
-
-    double discount = 0;
-    if (grandTotal >= 5000)
-    {
-        discount = grandTotal * 0.10;
-    }
-
-    Console.WriteLine("Discount: PHP" + discount);
-    Console.WriteLine("Final Total: PHP" + (grandTotal - discount));
-
-    Console.WriteLine("\nUPDATED STOCK");
-    for (int i = 0; i < products.Length; i++)
-    {
-        Console.WriteLine(products[i].Name + " - " + products[i].Stock);
-    }
-
-    Console.WriteLine("\nThank you for shopping with us!");   
-    Console.WriteLine("Have a nice day!"); 
-}
 }
 
-            
-    
-        
-
-        
-
-
-
-    
 
 
 
 
 
+
+
+               
